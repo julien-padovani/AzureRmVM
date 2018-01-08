@@ -1,4 +1,4 @@
-# AzureRmVM
+# AzureRmVMStartAll.ps1
 
    Start all the VMs in the Azure Subscription
 

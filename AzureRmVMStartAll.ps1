@@ -3,7 +3,7 @@
    Start all the VMs in the Azure Subscription
 .DESCRIPTION
    All VMs are started in parralel with Powershell Workflows. 
-   Enter subscription credentials at prompt. 
+   Enter subscription credentials at prompt.  
    Token is saved in a temp file, used for workflow, its removed at the end. 
 .EXAMPLE
    .\AzureRmVMStartAll.ps1

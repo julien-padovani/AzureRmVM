@@ -9,11 +9,10 @@
    .\AzureRmVMStartAll.ps1
 #>
 
+#Variables
 $TokenPath = "$env:TEMP\azureprofile.json"
 
-Login-AzureRmAccount
-Save-AzureRmProfile -Path $TokenPath -Force
-
+#Functions
 workflow StartVMs {
     param($VMs, $TokenPath)
     foreach -parallel ($vm in $VMs){
@@ -22,12 +21,10 @@ workflow StartVMs {
     }
 }
 
-#get VM list
-$VMs = Get-AzureRmVM 
-
-#Start VMs
-StartVMs $VMS $TokenPath
-
-#clean temp file
-Remove-item $TokenPath
+#Main
+Login-AzureRmAccount
+Save-AzureRmProfile -Path $TokenPath -Force
+$VMs = Get-AzureRmVM #get VM list
+StartVMs $VMS $TokenPath #Start VMs
+Remove-item $TokenPath #clean temp file
 

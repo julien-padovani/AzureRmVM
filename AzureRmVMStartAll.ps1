@@ -3,9 +3,9 @@
    Start all the VMs in a ressource group
 
 .DESCRIPTION
-   All VMs are started in parralel with Powershell Workflows. 
+   All VMs are started in parallel with Powershell Workflows. 
    Enter subscription credentials at prompt. 
-   Token is saved in a temp file, used for workflow (parrelal tasks), its removed at the end. 
+   Token is saved in a temp file, used for workflow (parallel tasks), its removed at the end. 
 
  .PARAMETER ResourceGroupName
     Specify the resource group of VM to start

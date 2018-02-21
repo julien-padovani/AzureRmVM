@@ -13,7 +13,7 @@
  .PARAMETER subscriptionId
 
  .EXAMPLE
-   .\AzureRmVMStartAll.ps1 -ResourceGroupName
+   .\AzureRmVMStartAll.ps1 -subscriptionid <myidhere> -ResourceGroupName <RGTEST>
 #>
 
 param

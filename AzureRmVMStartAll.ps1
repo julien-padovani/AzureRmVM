@@ -1,71 +1,55 @@
 ﻿<#
-.Synopsis
-   Start all the VMs in the Azure Subscription
+ .Synopsis
+   Start all the VMs in a ressource group
+
 .DESCRIPTION
    All VMs are started in parralel with Powershell Workflows. 
-   Enter subscription credentials at prompt.  
-   Token is saved in a temp file, used for workflow, its removed at the end. 
+   Enter subscription credentials at prompt. 
+   Token is saved in a temp file, used for workflow (parrelal tasks), its removed at the end. 
 
-.PARAMETER GetVMsList
-    Get and show list of available VMs 
+ .PARAMETER ResourceGroupName
+    Specify the resource group of VM to start
 
-.PARAMETER Selection
-	Start only VMs in the selection
+ .PARAMETER subscriptionId
 
-.EXAMPLE
-   .\AzureRmVMStartAll.ps1
+ .EXAMPLE
+   .\AzureRmVMStartAll.ps1 -ResourceGroupName
 #>
 
-Param(
-	[Switch]$GetVMsList,
-	[String[]]$Selection #List of VM name
+param
+(
+ [Parameter(Mandatory=$True)]
+ [string]
+ $SubscriptionId,
+
+ [Parameter(Mandatory=$True)]
+ [string]
+ $ResourceGroupName
 )
 
-#Variables
-$TokenPath = "$env:TEMP\azureprofile.json"
+$credentialsPath = "$env:TEMP\azureprofile.json"
 
+Login-AzureRmAccount
+Write-Host "Selecting subscription '$subscriptionId'";
+Select-AzureRmSubscription -SubscriptionID $subscriptionId;
+Save-AzureRmProfile -Path $credentialsPath -Force
 
-#Functions
-workflow StartVMs{
-    param($VMs, $TokenPath)
-    foreach -parallel ($vm in $VMs){
-        $null = Select-AzureRmProfile -Path $TokenPath
+workflow StartVMs 
+{
+    param($VMs, $credentialsPath)
+    foreach -parallel ($vm in $VMs)
+    {
+        Select-AzureRmProfile -Path $credentialsPath
         Start-AzureRmVM -ResourceGroupName $vm.ResourceGroupName -Name $vm.name
-	}
+    }
 }
 
-#Main
-Login-AzureRmAccount | Out-Null
-Save-AzureRmProfile -Path $TokenPath -Force
+#get VM list
+$VMs = Get-AzureRmVM -ResourceGroupName $ResourceGroupName
 
-$VMs = Get-AzureRmVM #get VM list
+#Start VMs
+StartVMs $VMS $credentialsPath
 
-if($GetVMsList){ 
-		$VMs.name
-		break
-}
-
-#Get VM objects from the list for VM in the selection
-if($Selection){
-	$NewList = @()
-	foreach ($VmName in $Selection){
-		$i= 0
-		do{
-			if($VMs[$i].name -match $VmName){
-				$NewList+= $VMs[$i]
-				break
-			}
-			$i++
-		} until($i -eq ($VMs.Count + 1))
-	}
-	$VMs = $NewList
-}
-
-"VMs to start"
-$VMs
-
-StartVMs $VMS $TokenPath #Start VMs 
-"Done"
-Get-AzureRmVM
-Remove-item $TokenPath #clean temp file
+#clean temp file
+Remove-item $credentialsPath
 
